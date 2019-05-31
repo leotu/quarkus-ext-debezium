@@ -24,10 +24,10 @@ public class MiscTest {
 
 	@Test
 	public void test() {
-		byte[] bytes1 = "ABCDEF".getBytes(StandardCharsets.ISO_8859_1);
-		byte[] bytes2 = "ABC1EF".getBytes(StandardCharsets.ISO_8859_1);
-		byte[] bytes3 = "ABCDEF".getBytes(StandardCharsets.ISO_8859_1);
-		byte[] bytes4 = "ABCDEF4".getBytes(StandardCharsets.ISO_8859_1);
+		Object bytes1 = "ABCDEF".getBytes(StandardCharsets.ISO_8859_1);
+		Object bytes2 = "ABC1EF".getBytes(StandardCharsets.ISO_8859_1);
+		Object bytes3 = "ABCDEF".getBytes(StandardCharsets.ISO_8859_1);
+		Object bytes4 = "ABCDEF4".getBytes(StandardCharsets.ISO_8859_1);
 
 		System.out.println("isArray: " + bytes1.getClass().isArray());
 		System.out.println("equals: " + Objects.equals(bytes1, bytes2));

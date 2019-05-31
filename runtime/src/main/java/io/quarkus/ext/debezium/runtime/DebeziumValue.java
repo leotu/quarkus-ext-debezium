@@ -36,374 +36,375 @@ import io.smallrye.reactive.messaging.kafka.KafkaMessage;
  * @see io.smallrye.reactive.messaging.kafka.ReceivedKafkaMessage
  */
 public class DebeziumValue {
-    static final protected Logger log = LoggerFactory.getLogger(DebeziumValue.class);
+	static final protected Logger log = LoggerFactory.getLogger(DebeziumValue.class);
 
-    final private SchemaAndValue schemaAndValue;
-    final private Struct payload;
-    final private Operation op;
-    final private Date eventTime;
+	final private SchemaAndValue schemaAndValue;
+	final private Struct payload;
+	final private Operation op;
+	final private Date eventTime;
 
-    public DebeziumValue(KafkaMessage<?, SchemaAndValue> msg) {
-        this(msg.getPayload());
-    }
+	public DebeziumValue(KafkaMessage<?, SchemaAndValue> msg) {
+		this(msg.getPayload());
+	}
 
-    public DebeziumValue(SchemaAndValue schemaAndValue) {
-        this.schemaAndValue = schemaAndValue;
-        this.payload = (Struct) this.schemaAndValue.value();
+	public DebeziumValue(SchemaAndValue schemaAndValue) {
+		this.schemaAndValue = schemaAndValue;
+		this.payload = (Struct) this.schemaAndValue.value();
 
-        String opType = (String) this.payload.get(FieldName.OPERATION);
-        this.op = Operation.forCode(opType);
+		String opType = (String) this.payload.get(FieldName.OPERATION);
+		this.op = Operation.forCode(opType);
 
-        Long timestamp = (Long) this.payload.get(FieldName.TIMESTAMP);
-        this.eventTime = new Date(timestamp);
-    }
+		Long timestamp = (Long) this.payload.get(FieldName.TIMESTAMP);
+		this.eventTime = new Date(timestamp);
+	}
 
-    public Operation getOp() {
-        return op;
-    }
+	public Operation getOp() {
+		return op;
+	}
 
-    public boolean isUpdated() {
-        return op == Operation.UPDATE;
-    }
+	public boolean isUpdated() {
+		return op == Operation.UPDATE;
+	}
 
-    public boolean isCreated() {
-        return op == Operation.CREATE;
-    }
+	public boolean isCreated() {
+		return op == Operation.CREATE;
+	}
 
-    public boolean isDeleted() {
-        return op == Operation.DELETE;
-    }
+	public boolean isDeleted() {
+		return op == Operation.DELETE;
+	}
 
-    public boolean isRead() {
-        return op == Operation.READ;
-    }
+	public boolean isRead() {
+		return op == Operation.READ;
+	}
 
-    public Date getEventTime() {
-        return eventTime;
-    }
+	public Date getEventTime() {
+		return eventTime;
+	}
 
-    // public List<Field> getBeforeFields() {
-    // return schemaAndValue.schema().field(FieldName.BEFORE).schema().fields();
-    // }
-    //
-    // public List<Field> getAfterFields() {
-    // return schemaAndValue.schema().field(FieldName.AFTER).schema().fields();
-    // }
-    //
-    // public Field getBeforeField(String fieldName) {
-    // return
-    // schemaAndValue.schema().field(FieldName.BEFORE).schema().field(fieldName);
-    // }
-    //
-    // public Field getAfterField(String fieldName) {
-    // return
-    // schemaAndValue.schema().field(FieldName.AFTER).schema().field(fieldName);
-    // }
-    //
-    // public Type getFieldType(Field field) {
-    // return field.schema().type();
-    // }
-    //
-    // public boolean isOptional(Field field) {
-    // return field.schema().isOptional();
-    // }
-    //
-    // public Object getDefaultValue(Field field) {
-    // return field.schema().defaultValue();
-    // }
-    //
-    // /**
-    // * Without default value
-    // */
-    // public Optional<Object> getBeforeValue(String fieldName) {
-    // Object before = payload.get(FieldName.BEFORE);
-    // if (before == null) {
-    // return Optional.empty();
-    // }
-    // return Optional.ofNullable(getValue((Struct) before, fieldName));
-    // }
-    //
-    // /**
-    // * Without default value
-    // */
-    // public Optional<Object> getAfterValue(String fieldName) {
-    // Object after = payload.get(FieldName.AFTER);
-    // if (after == null) {
-    // return Optional.empty();
-    // }
-    // return Optional.ofNullable(getValue((Struct) after, fieldName));
-    // }
+	// public List<Field> getBeforeFields() {
+	// return schemaAndValue.schema().field(FieldName.BEFORE).schema().fields();
+	// }
+	//
+	// public List<Field> getAfterFields() {
+	// return schemaAndValue.schema().field(FieldName.AFTER).schema().fields();
+	// }
+	//
+	// public Field getBeforeField(String fieldName) {
+	// return
+	// schemaAndValue.schema().field(FieldName.BEFORE).schema().field(fieldName);
+	// }
+	//
+	// public Field getAfterField(String fieldName) {
+	// return
+	// schemaAndValue.schema().field(FieldName.AFTER).schema().field(fieldName);
+	// }
+	//
+	// public Type getFieldType(Field field) {
+	// return field.schema().type();
+	// }
+	//
+	// public boolean isOptional(Field field) {
+	// return field.schema().isOptional();
+	// }
+	//
+	// public Object getDefaultValue(Field field) {
+	// return field.schema().defaultValue();
+	// }
+	//
+	// /**
+	// * Without default value
+	// */
+	// public Optional<Object> getBeforeValue(String fieldName) {
+	// Object before = payload.get(FieldName.BEFORE);
+	// if (before == null) {
+	// return Optional.empty();
+	// }
+	// return Optional.ofNullable(getValue((Struct) before, fieldName));
+	// }
+	//
+	// /**
+	// * Without default value
+	// */
+	// public Optional<Object> getAfterValue(String fieldName) {
+	// Object after = payload.get(FieldName.AFTER);
+	// if (after == null) {
+	// return Optional.empty();
+	// }
+	// return Optional.ofNullable(getValue((Struct) after, fieldName));
+	// }
 
-    static public class UpdatedField {
-        private final FieldValue before;
-        private final FieldValue after;
+	static public class UpdatedField {
+		private final FieldValue before;
+		private final FieldValue after;
 
-        public UpdatedField(FieldValue before, FieldValue after) {
-            this.before = before;
-            this.after = after;
-        }
+		public UpdatedField(FieldValue before, FieldValue after) {
+			this.before = before;
+			this.after = after;
+		}
 
-        public FieldValue getBefore() {
-            return before;
-        }
+		public FieldValue getBefore() {
+			return before;
+		}
 
-        public FieldValue getAfter() {
-            return after;
-        }
+		public FieldValue getAfter() {
+			return after;
+		}
 
-        public String name() {
-            return before.name();
-        }
+		public String name() {
+			return before.name();
+		}
 
-        @Override
-        public String toString() {
-            return super.toString() + "{before:" + before + ", after:" + after + "}";
-        }
+		@Override
+		public String toString() {
+			return super.toString() + "{before:" + before + ", after:" + after + "}";
+		}
 
-    }
+	}
 
-    static public class FieldValue {
-        private final Field field;
-        private final Object value;
+	static public class FieldValue {
+		private final Field field;
+		private final Object value;
 
-        public FieldValue(Field field, Object value) {
-            this.field = field;
-            this.value = value;
-        }
+		public FieldValue(Field field, Object value) {
+			this.field = field;
+			this.value = value;
+		}
 
-        public Field getField() {
-            return field;
-        }
+		public Field getField() {
+			return field;
+		}
 
-        public Object getValue() {
-            return value;
-        }
+		public Object getValue() {
+			return value;
+		}
 
-        public String name() {
-            return field.name();
-        }
+		public String name() {
+			return field.name();
+		}
 
-        @Override
-        public String toString() {
-            return super.toString() + "{field:" + field.name() + ", value:" + value + "}";
-        }
-    }
+		@Override
+		public String toString() {
+			return super.toString() + "{field:" + field.name() + ", value:" + value + "}";
+		}
+	}
 
-    /**
-     * @return never null
-     */
-    public UpdatedField[] getUpdatedFields() {
-        if (op != Operation.UPDATE) {
-            throw new IllegalStateException("Not Updated Action");
-        }
+	/**
+	 * @return never null
+	 */
+	public UpdatedField[] getUpdatedFields() {
+		if (op != Operation.UPDATE) {
+			throw new IllegalStateException("Not Updated Action");
+		}
 
-        Struct beforeRecord = (Struct) payload.get(FieldName.BEFORE);
-        Struct afterRecord = (Struct) payload.get(FieldName.AFTER);
-        if (beforeRecord == null || afterRecord == null) {
-            throw new IllegalStateException("(beforeRecord == null || afterRecord == null)");
-        }
+		Struct beforeRecord = (Struct) payload.get(FieldName.BEFORE);
+		Struct afterRecord = (Struct) payload.get(FieldName.AFTER);
+		if (beforeRecord == null || afterRecord == null) {
+			throw new IllegalStateException("(beforeRecord == null || afterRecord == null)");
+		}
 
-        if (beforeRecord.schema().fields().size() != afterRecord.schema().fields().size()) {
-            throw new IllegalStateException(
-                    "(beforeRecord.schema().fields().size() != afterRecord.schema().fields().size())");
-        }
+		if (beforeRecord.schema().fields().size() != afterRecord.schema().fields().size()) {
+			throw new IllegalStateException(
+					"(beforeRecord.schema().fields().size() != afterRecord.schema().fields().size())");
+		}
 
-        List<UpdatedField> updatedFields = new ArrayList<>();
-        beforeRecord.schema().fields().forEach(beforeField -> {
-            String fieldName = beforeField.name();
-            Object beforeValue = getValue(beforeRecord, fieldName);
-            Object afterValue = getValue(afterRecord, fieldName);
+		List<UpdatedField> updatedFields = new ArrayList<>();
+		beforeRecord.schema().fields().forEach(beforeField -> {
+			String fieldName = beforeField.name();
+			Object beforeValue = getValue(beforeRecord, fieldName);
+			Object afterValue = getValue(afterRecord, fieldName);
 
-            boolean equalsValue;
-            if (beforeValue != null && beforeValue.getClass().isArray() && afterValue != null
-                    && afterValue.getClass().isArray()) {
-                equalsValue = Objects.deepEquals(beforeValue, afterValue);
-            } else {
-                equalsValue = Objects.equals(beforeValue, afterValue);
-            }
+			boolean equalsValue;
+			if (beforeValue != null && beforeValue.getClass().isArray() && afterValue != null
+					&& afterValue.getClass().isArray()) {
+				equalsValue = Objects.deepEquals(beforeValue, afterValue);
+			} else {
+				equalsValue = Objects.equals(beforeValue, afterValue);
+			}
 
-            if (!equalsValue) {
-                FieldValue before = new FieldValue(beforeField, beforeValue);
-                FieldValue after = new FieldValue(beforeRecord.schema().field(fieldName), afterValue);
-                UpdatedField updated = new UpdatedField(before, after);
-                updatedFields.add(updated);
-            }
-        });
+			if (!equalsValue) {
+				FieldValue before = new FieldValue(beforeField, beforeValue);
+				FieldValue after = new FieldValue(beforeRecord.schema().field(fieldName), afterValue);
+				UpdatedField updated = new UpdatedField(before, after);
+				updatedFields.add(updated);
+			}
+		});
 
-        if (updatedFields.isEmpty()) {
-            throw new IllegalStateException("Not Updated Field");
-        }
-        return updatedFields.toArray(new UpdatedField[0]);
-    }
+		if (updatedFields.isEmpty()) {
+			log.warn("(updatedFields.isEmpty())");
+			throw new IllegalStateException("No Updated Field");
+		}
+		return updatedFields.toArray(new UpdatedField[0]);
+	}
 
-    /**
-     * @return never null
-     */
-    public FieldValue[] getCreatedFields() {
-        if (op != Operation.CREATE) {
-            throw new IllegalStateException("Not Created Action");
-        }
+	/**
+	 * @return never null
+	 */
+	public FieldValue[] getCreatedFields() {
+		if (op != Operation.CREATE) {
+			throw new IllegalStateException("Not Created Action");
+		}
 
-        Struct beforeRecord = (Struct) payload.get(FieldName.BEFORE);
-        Struct afterRecord = (Struct) payload.get(FieldName.AFTER);
-        if (beforeRecord != null || afterRecord == null) {
-            throw new IllegalStateException("(beforeRecord != null || afterRecord == null)");
-        }
+		Struct beforeRecord = (Struct) payload.get(FieldName.BEFORE);
+		Struct afterRecord = (Struct) payload.get(FieldName.AFTER);
+		if (beforeRecord != null || afterRecord == null) {
+			throw new IllegalStateException("(beforeRecord != null || afterRecord == null)");
+		}
 
-        FieldValue[] createdFields = getAllAfterValues().get();
-        if (createdFields.length == 0) {
-            throw new IllegalStateException("Not Created Field");
-        }
-        return createdFields;
-    }
+		FieldValue[] createdFields = getAllAfterValues().get();
+		if (createdFields.length == 0) {
+			throw new IllegalStateException("No Created Field");
+		}
+		return createdFields;
+	}
 
-    /**
-     * @return never null
-     */
-    public FieldValue[] getDeletedFields() {
-        if (op != Operation.DELETE) {
-            throw new IllegalStateException("Not Deleted Action");
-        }
+	/**
+	 * @return never null
+	 */
+	public FieldValue[] getDeletedFields() {
+		if (op != Operation.DELETE) {
+			throw new IllegalStateException("Not Deleted Action");
+		}
 
-        Struct beforeRecord = (Struct) payload.get(FieldName.BEFORE);
-        Struct afterRecord = (Struct) payload.get(FieldName.AFTER);
-        if (beforeRecord == null || afterRecord != null) {
-            throw new IllegalStateException("(beforeRecord == null || afterRecord != null)");
-        }
+		Struct beforeRecord = (Struct) payload.get(FieldName.BEFORE);
+		Struct afterRecord = (Struct) payload.get(FieldName.AFTER);
+		if (beforeRecord == null || afterRecord != null) {
+			throw new IllegalStateException("(beforeRecord == null || afterRecord != null)");
+		}
 
-        FieldValue[] deletedFields = getAllBeforeValues().get();
-        if (deletedFields.length == 0) {
-            throw new IllegalStateException("Not Deleted Field");
-        }
-        return deletedFields;
-    }
+		FieldValue[] deletedFields = getAllBeforeValues().get();
+		if (deletedFields.length == 0) {
+			throw new IllegalStateException("No Deleted Field");
+		}
+		return deletedFields;
+	}
 
-    /**
-     * Without default value
-     */
-    public Optional<FieldValue[]> getAllBeforeValues() {
-        Object before = payload.get(FieldName.BEFORE);
-        if (before == null) {
-            return Optional.empty();
-        }
+	/**
+	 * Without default value
+	 */
+	public Optional<FieldValue[]> getAllBeforeValues() {
+		Object before = payload.get(FieldName.BEFORE);
+		if (before == null) {
+			return Optional.empty();
+		}
 
-        Struct record = (Struct) before;
-        List<Field> fields = record.schema().fields();
-        FieldValue fieldValueAry[] = new FieldValue[fields.size()];
-        for (int i = 0; i < fields.size(); i++) {
-            Field field = fields.get(i);
-            fieldValueAry[i] = new FieldValue(field, getValue(record, field.name()));
-        }
+		Struct record = (Struct) before;
+		List<Field> fields = record.schema().fields();
+		FieldValue fieldValueAry[] = new FieldValue[fields.size()];
+		for (int i = 0; i < fields.size(); i++) {
+			Field field = fields.get(i);
+			fieldValueAry[i] = new FieldValue(field, getValue(record, field.name()));
+		}
 
-        return Optional.of(fieldValueAry);
-    }
+		return Optional.of(fieldValueAry);
+	}
 
-    /**
-     * Without default value
-     */
-    public Optional<FieldValue[]> getAllAfterValues() {
-        Object after = payload.get(FieldName.AFTER);
-        if (after == null) {
-            return Optional.empty();
-        }
+	/**
+	 * Without default value
+	 */
+	public Optional<FieldValue[]> getAllAfterValues() {
+		Object after = payload.get(FieldName.AFTER);
+		if (after == null) {
+			return Optional.empty();
+		}
 
-        Struct record = (Struct) after;
-        List<Field> fields = record.schema().fields();
-        FieldValue fieldValueAry[] = new FieldValue[fields.size()];
-        for (int i = 0; i < fields.size(); i++) {
-            Field field = fields.get(i);
-            fieldValueAry[i] = new FieldValue(field, getValue(record, field.name()));
-        }
+		Struct record = (Struct) after;
+		List<Field> fields = record.schema().fields();
+		FieldValue fieldValueAry[] = new FieldValue[fields.size()];
+		for (int i = 0; i < fields.size(); i++) {
+			Field field = fields.get(i);
+			fieldValueAry[i] = new FieldValue(field, getValue(record, field.name()));
+		}
 
-        return Optional.of(fieldValueAry);
-    }
+		return Optional.of(fieldValueAry);
+	}
 
-    /**
-     * Without default value
-     */
-    static Object getValue(Struct record, String fieldName) {
-        Field field = record.schema().field(fieldName);
-        if (field == null) {
-            log.warn("(field == null), fieldName: {}", fieldName);
-            throw new IllegalArgumentException("Field: '" + fieldName + "' Not Found");
-        }
-        Type type = field.schema().type();
-        String typeLogicalName = field.schema().name();
+	/**
+	 * Without default value
+	 */
+	static Object getValue(Struct record, String fieldName) {
+		Field field = record.schema().field(fieldName);
+		if (field == null) {
+			log.warn("(field == null), fieldName: {}", fieldName);
+			throw new IllegalArgumentException("Field: '" + fieldName + "' Not Found");
+		}
+		Type type = field.schema().type();
+		String typeLogicalName = field.schema().name();
 
-        Object val;
-        if (type == Schema.Type.INT8) {
-            val = record.getInt8(field.name());
-        } else if (type == Schema.Type.INT16) {
-            val = record.getInt16(field.name());
-        } else if (type == Schema.Type.INT32) {
-            // 8200 = '1992-06-14', 15139 = '2011-06-14'
-            if (io.debezium.time.Date.SCHEMA_NAME.equals(typeLogicalName)) {
-                Integer epochDay = record.getInt32(field.name());
-                val = epochDay == null ? null : LocalDate.ofEpochDay(epochDay);
-            } else {
-                val = record.getInt32(field.name());
-            }
-        } else if (type == Schema.Type.INT64) {
-            // 349891365000 = '2019-05-31 10:27:01'
-            if (io.debezium.time.Timestamp.SCHEMA_NAME.equals(typeLogicalName)) {
-                Long tm = record.getInt64(field.name());
-                val = tm == null ? null : LocalDateTime.ofInstant(new Date(tm).toInstant(), ZoneOffset.UTC);
-            } else {
-                val = record.getInt64(field.name());
-            }
-        } else if (type == Schema.Type.BOOLEAN) {
-            val = record.getBoolean(field.name());
-        } else if (type == Schema.Type.STRING) {
-            // "2019-05-31T02:27:01Z" ==> "2019-05-31T10:27:01"
-            if (io.debezium.time.ZonedTimestamp.SCHEMA_NAME.equals(typeLogicalName)) {
-                String iso8601Str = record.getString(field.name());
-                val = iso8601Str == null ? null
-                        : LocalDateTime.ofInstant(
-                                ZonedDateTime.parse(iso8601Str, DateTimeFormatter.ISO_OFFSET_DATE_TIME).toInstant(),
-                                ZoneId.systemDefault());
-            } else {
-                val = record.getString(field.name());
-            }
-        } else if (type == Schema.Type.FLOAT32) {
-            val = record.getFloat32(field.name());
-        } else if (type == Schema.Type.FLOAT64) {
-            val = record.getFloat64(field.name());
-        } else if (type == Schema.Type.BYTES) {
-            if (Decimal.LOGICAL_NAME.equals(typeLogicalName)) {
-                val = getBigDecimal(record, field.name());
-            } else {
-                val = record.getBytes(field.name());
-            }
-        } else if (type == Schema.Type.ARRAY) {
-            val = record.getArray(field.name());
-        } else if (type == Schema.Type.MAP) {
-            val = record.getMap(field.name());
-        } else if (type == Schema.Type.STRUCT) {
-            val = record.getStruct(field.name());
-        } else {
-            val = record.getWithoutDefault(field.name());
-            log.warn("No type match: fieldName: {}, type: {}, typeLogicalName: {}, val.class: {}, val: {}", fieldName, type,
-                    typeLogicalName, val == null ? "<null>" : val.getClass().getName(), val);
-        }
-        // log.debug("fieldName: {}, type: {}, typeLogicalName: {}, val.class: {}, val:
-        // {}", fieldName, type,
-        // typeLogicalName, val == null ? "<null>" : val.getClass().getName(), (val
-        // instanceof byte[]) ? "<byte[]>" : val);
-        return val;
-    }
+		Object val;
+		if (type == Schema.Type.INT8) {
+			val = record.getInt8(field.name());
+		} else if (type == Schema.Type.INT16) {
+			val = record.getInt16(field.name());
+		} else if (type == Schema.Type.INT32) {
+			// 8200 = '1992-06-14', 15139 = '2011-06-14'
+			if (io.debezium.time.Date.SCHEMA_NAME.equals(typeLogicalName)) {
+				Integer epochDay = record.getInt32(field.name());
+				val = epochDay == null ? null : LocalDate.ofEpochDay(epochDay);
+			} else {
+				val = record.getInt32(field.name());
+			}
+		} else if (type == Schema.Type.INT64) {
+			// 349891365000 = '2019-05-31 10:27:01'
+			if (io.debezium.time.Timestamp.SCHEMA_NAME.equals(typeLogicalName)) {
+				Long tm = record.getInt64(field.name());
+				val = tm == null ? null : LocalDateTime.ofInstant(new Date(tm).toInstant(), ZoneOffset.UTC);
+			} else {
+				val = record.getInt64(field.name());
+			}
+		} else if (type == Schema.Type.BOOLEAN) {
+			val = record.getBoolean(field.name());
+		} else if (type == Schema.Type.STRING) {
+			// "2019-05-31T02:27:01Z" ==> "2019-05-31T10:27:01"
+			if (io.debezium.time.ZonedTimestamp.SCHEMA_NAME.equals(typeLogicalName)) {
+				String iso8601Str = record.getString(field.name());
+				val = iso8601Str == null ? null
+						: LocalDateTime.ofInstant(
+								ZonedDateTime.parse(iso8601Str, DateTimeFormatter.ISO_OFFSET_DATE_TIME).toInstant(),
+								ZoneId.systemDefault());
+			} else {
+				val = record.getString(field.name());
+			}
+		} else if (type == Schema.Type.FLOAT32) {
+			val = record.getFloat32(field.name());
+		} else if (type == Schema.Type.FLOAT64) {
+			val = record.getFloat64(field.name());
+		} else if (type == Schema.Type.BYTES) {
+			if (Decimal.LOGICAL_NAME.equals(typeLogicalName)) {
+				val = getBigDecimal(record, field.name());
+			} else {
+				val = record.getBytes(field.name());
+			}
+		} else if (type == Schema.Type.ARRAY) {
+			val = record.getArray(field.name());
+		} else if (type == Schema.Type.MAP) {
+			val = record.getMap(field.name());
+		} else if (type == Schema.Type.STRUCT) {
+			val = record.getStruct(field.name());
+		} else {
+			val = record.getWithoutDefault(field.name());
+			log.warn("No type match: fieldName: {}, type: {}, typeLogicalName: {}, val.class: {}, val: {}", fieldName,
+					type, typeLogicalName, val == null ? "<null>" : val.getClass().getName(), val);
+		}
+		// log.debug("fieldName: {}, type: {}, typeLogicalName: {}, val.class: {}, val:
+		// {}", fieldName, type,
+		// typeLogicalName, val == null ? "<null>" : val.getClass().getName(), (val
+		// instanceof byte[]) ? "<byte[]>" : val);
+		return val;
+	}
 
-    /**
-     * Without default value
-     */
-    static protected BigDecimal getBigDecimal(Struct record, String fieldName) {
-        return (BigDecimal) record.getWithoutDefault(fieldName);
-    }
+	/**
+	 * Without default value
+	 */
+	static protected BigDecimal getBigDecimal(Struct record, String fieldName) {
+		return (BigDecimal) record.getWithoutDefault(fieldName);
+	}
 
-    /**
-     * With default value
-     */
-    static protected Object getWithDefault(Struct record, String fieldName) {
-        return record.get(fieldName);
-    }
+	/**
+	 * With default value
+	 */
+	static protected Object getWithDefault(Struct record, String fieldName) {
+		return record.get(fieldName);
+	}
 
 }

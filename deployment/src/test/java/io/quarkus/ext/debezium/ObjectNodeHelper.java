@@ -17,14 +17,8 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  */
 public class ObjectNodeHelper {
 
-    private final ObjectNode root;
-
-    public ObjectNodeHelper() {
-        this.root = JsonNodeFactory.instance.objectNode();
-    }
-
-    public ObjectNode getRoot() {
-        return root;
+    public ObjectNode createObjectNode() {
+        return JsonNodeFactory.instance.objectNode();
     }
 
     public ObjectNode put(ObjectNode node, String name, Object value) {
