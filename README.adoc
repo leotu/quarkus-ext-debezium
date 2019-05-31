@@ -1,0 +1,23 @@
+= Quarkus Debezium extension
+
+This is a https://github.com/quarkusio/quarkus[Quarkus] extension for https://github.com/debezium/debezium[Debezium].
+
+== deployment maven
+clean install -Dmaven.test.skip=false -Dquarkus.debug.generated-classes-dir=./target/app-generated-classes
+
+
+== runtime maven
+clean install -Dmaven.test.skip=true
+
+== Test docker
+ 
+[source,bash]
+--------------
+docker-compose -f .../docker-compose.yaml up -d
+docker-compose -f .../docker-compose.yaml down
+--------------
+
+== Check docker
+[source,text]
+--------------
+docker-compose -f .../docker-compose.yaml ps

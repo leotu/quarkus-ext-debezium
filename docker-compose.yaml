@@ -1,0 +1,163 @@
+version: '3.5'
+services:
+
+  # https://debezium.io/docs/tutorial/
+  # https://hub.docker.com/r/debezium/zookeeper
+  zookeeper:
+    image: debezium/zookeeper:0.10
+    container_name: zookeeper
+    networks:
+      - debezium
+    ports:
+      - "2181:2181"
+      - "2888:2888"
+      - "3888:3888"
+    environment:
+      TZ: Asia/Shanghai
+      LANG: en_US.UTF-8
+      LC_CTYPE: en_US.UTF-8
+    restart: always
+
+  # https://hub.docker.com/r/debezium/kafka/
+  kafka:
+    image: debezium/kafka:0.10
+    container_name: kafka
+    networks:
+      - debezium
+    ports:
+      - "9092:9092"
+    environment:
+      TZ: Asia/Shanghai
+      LANG: en_US.UTF-8
+      LC_CTYPE: en_US.UTF-8
+      HOST_NAME: kafka
+      ZOOKEEPER_CONNECT: zookeeper:2181
+      BROKER_ID: 1
+    restart: always
+    depends_on:
+      - zookeeper
+   
+  # https://hub.docker.com/r/debezium/example-mysql
+  mysql:
+    image: debezium/example-mysql:0.10
+    container_name: mysql
+    networks:
+      - debezium
+    ports:
+      - "3306:3306"
+    environment:
+      TZ: Asia/Shanghai
+      LANG: en_US.UTF-8
+      LC_CTYPE: en_US.UTF-8
+      MYSQL_DATABASE: inventory
+      MYSQL_USER: mysqluser
+      MYSQL_PASSWORD: mysqlpw
+      MYSQL_ROOT_PASSWORD: debezium
+    restart: always
+    volumes:
+      - /Users/leo/docker/debezium/mysql/data:/var/lib/mysql
+      - /Users/leo/docker/debezium/mysql/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+
+
+  # https://hub.docker.com/r/debezium/postgres
+  postgres:
+    image: debezium/example-postgres:0.10
+    container_name: postgres
+    networks:
+      - debezium
+    ports:
+      - "5432:5432"
+    environment:
+      TZ: Asia/Shanghai
+      LANG: en_US.UTF-8
+      LC_CTYPE: en_US.UTF-8
+    restart: always
+
+  # https://hub.docker.com/r/debezium/example-mongodb
+  mongodb:
+    image: debezium/example-mongodb:0.10
+    container_name: mongodb
+    networks:
+      - debezium
+    ports:
+      - "27017:27017"
+    environment:
+      TZ: Asia/Shanghai
+      LANG: en_US.UTF-8
+      LC_CTYPE: en_US.UTF-8
+    restart: always
+
+
+  # https://hub.docker.com/r/debezium/connect
+  connect:
+    image: debezium/connect:0.10
+    container_name: connect
+    networks:
+      - debezium
+    ports:
+      - "8083:8083"
+    environment:
+      TZ: Asia/Shanghai
+      LANG: en_US.UTF-8
+      LC_CTYPE: en_US.UTF-8
+      GROUP_ID: 1
+      CONFIG_STORAGE_TOPIC: my_connect_configs
+      OFFSET_STORAGE_TOPIC: my_connect_offsets
+      STATUS_STORAGE_TOPIC: my_connect_statuses
+      BOOTSTRAP_SERVERS: kafka:9092
+    restart: always
+    depends_on:
+      - zookeeper
+      - kafka
+      - mysql
+      - postgres
+      - mongodb
+
+  # https://hub.docker.com/r/zenko/kafka-manager
+  # http://localhost:9000
+  kafka-manager:
+    image: zenko/kafka-manager
+    container_name: kafka-manager
+    networks:
+      - debezium
+    ports:
+      - "9000:9000"
+    environment:
+      TZ: Asia/Shanghai
+      LANG: en_US.UTF-8
+      LC_CTYPE: en_US.UTF-8
+      ZK_HOSTS: "zookeeper:2181"
+    restart: always
+    depends_on:
+      - kafka
+
+  # https://github.com/qiuxiafei/zk-web
+  # http://localhost:9090/ --> browser url input "zookeeper:2181"
+  zk-web:
+    image: vivint/zk-web-docker
+    container_name: zk-web
+    networks:
+      - debezium
+    ports:
+      - "9090:8080"
+    environment:
+      TZ: Asia/Shanghai
+      LANG: en_US.UTF-8
+      LC_CTYPE: en_US.UTF-8
+      ZK_HOSTS: "zookeeper:2181"
+    restart: always
+    depends_on:
+      - kafka
+
+networks:
+  debezium:
+    driver: bridge
+    name: debezium-nic
+
+# ========================
+# MaxOSX: 
+# sudo nano /etc/hosts
+# Add:
+# 127.0.0.1 kafka
+# ========================
