@@ -15,11 +15,11 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * 
  * @author <a href="mailto:leo.tu.taipei@gmail.com">Leo Tu</a>
  */
-public class ObjectNodeUtil {
+public class ObjectNodeHelper {
 
     private final ObjectNode root;
 
-    public ObjectNodeUtil() {
+    public ObjectNodeHelper() {
         this.root = JsonNodeFactory.instance.objectNode();
     }
 

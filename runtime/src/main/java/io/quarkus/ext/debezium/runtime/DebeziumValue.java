@@ -50,8 +50,10 @@ public class DebeziumValue {
     public DebeziumValue(SchemaAndValue schemaAndValue) {
         this.schemaAndValue = schemaAndValue;
         this.payload = (Struct) this.schemaAndValue.value();
+
         String opType = (String) this.payload.get(FieldName.OPERATION);
         this.op = Operation.forCode(opType);
+
         Long timestamp = (Long) this.payload.get(FieldName.TIMESTAMP);
         this.eventTime = new Date(timestamp);
     }
@@ -205,14 +207,22 @@ public class DebeziumValue {
             throw new IllegalStateException(
                     "(beforeRecord.schema().fields().size() != afterRecord.schema().fields().size())");
         }
-        // Map<String, UpdatedField> updatedFields = new
-        // TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+
         List<UpdatedField> updatedFields = new ArrayList<>();
         beforeRecord.schema().fields().forEach(beforeField -> {
             String fieldName = beforeField.name();
             Object beforeValue = getValue(beforeRecord, fieldName);
             Object afterValue = getValue(afterRecord, fieldName);
-            if (!Objects.equals(beforeValue, afterValue)) {
+
+            boolean equalsValue;
+            if (beforeValue != null && beforeValue.getClass().isArray() && afterValue != null
+                    && afterValue.getClass().isArray()) {
+                equalsValue = Objects.deepEquals(beforeValue, afterValue);
+            } else {
+                equalsValue = Objects.equals(beforeValue, afterValue);
+            }
+
+            if (!equalsValue) {
                 FieldValue before = new FieldValue(beforeField, beforeValue);
                 FieldValue after = new FieldValue(beforeRecord.schema().field(fieldName), afterValue);
                 UpdatedField updated = new UpdatedField(before, after);
@@ -372,11 +382,13 @@ public class DebeziumValue {
             val = record.getStruct(field.name());
         } else {
             val = record.getWithoutDefault(field.name());
-            log.warn("No match: fieldName: {}, type: {}, typeLogicalName: {}, val.class: {}, val: {}", fieldName, type,
+            log.warn("No type match: fieldName: {}, type: {}, typeLogicalName: {}, val.class: {}, val: {}", fieldName, type,
                     typeLogicalName, val == null ? "<null>" : val.getClass().getName(), val);
         }
-        //        log.debug("fieldName: {}, type: {}, typeLogicalName: {}, val.class: {}, val: {}", fieldName, type,
-        //                typeLogicalName, val == null ? "<null>" : val.getClass().getName(), (val instanceof byte[]) ? "<byte[]>" : val);
+        // log.debug("fieldName: {}, type: {}, typeLogicalName: {}, val.class: {}, val:
+        // {}", fieldName, type,
+        // typeLogicalName, val == null ? "<null>" : val.getClass().getName(), (val
+        // instanceof byte[]) ? "<byte[]>" : val);
         return val;
     }
 

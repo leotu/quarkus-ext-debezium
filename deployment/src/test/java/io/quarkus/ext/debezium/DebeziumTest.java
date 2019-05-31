@@ -147,8 +147,8 @@ public class DebeziumTest {
             log.debug("msg.getPayload: {}", msg.getPayload());
             log.debug("msg.getHeaders: {}", msg.getHeaders());
 
-            ObjectNodeUtil nodeUtil = new ObjectNodeUtil();
-            ObjectNode rootNode = nodeUtil.getRoot();
+            ObjectNodeHelper helper = new ObjectNodeHelper();
+            ObjectNode rootNode = helper.getRoot();
             rootNode.put("topic", msg.getTopic());
 
             //
@@ -157,7 +157,7 @@ public class DebeziumTest {
                 // log.debug("class: {}, header.key: {}, value: {}, toString: {}",
                 // header.getClass().getName(),
                 // header.key(), header.value(), header.toString());
-                nodeUtil.put(headerNode, header.key(), header.value());
+                helper.put(headerNode, header.key(), header.value());
             });
             if (headerNode.fields().hasNext()) {
                 rootNode.set("header", headerNode);
@@ -173,7 +173,7 @@ public class DebeziumTest {
                     String name = fv.name();
                     Object val = fv.getValue();
                     // log.debug("## key name: {}, val: {}", name, val);
-                    nodeUtil.put(keyNode, name, val);
+                    helper.put(keyNode, name, val);
                 });
             });
 
@@ -193,7 +193,7 @@ public class DebeziumTest {
                 Stream.of(schemaPayload.getUpdatedFields()).forEach(updated -> {
                     String name = updated.name();
                     Object val = updated.getAfter().getValue();
-                    nodeUtil.put(opNode, name, val);
+                    helper.put(opNode, name, val);
                     // log.debug("## isUpdated name: {}, val: {}", name, val);
                 });
             } else if (schemaPayload.isCreated()) {
@@ -201,7 +201,7 @@ public class DebeziumTest {
                 Stream.of(schemaPayload.getCreatedFields()).forEach(created -> {
                     String name = created.name();
                     Object val = created.getValue();
-                    nodeUtil.put(opNode, name, val);
+                    helper.put(opNode, name, val);
                     // log.debug("## isCreated name: {}, val: {}", name, val);
                 });
             } else if (schemaPayload.isDeleted()) {
@@ -209,7 +209,7 @@ public class DebeziumTest {
                 Stream.of(schemaPayload.getDeletedFields()).forEach(deleted -> {
                     String name = deleted.name();
                     Object val = deleted.getValue();
-                    nodeUtil.put(opNode, name, val);
+                    helper.put(opNode, name, val);
                     // log.debug("## isDeleted name: {}, val: {}", name, val);
                 });
             } else {
