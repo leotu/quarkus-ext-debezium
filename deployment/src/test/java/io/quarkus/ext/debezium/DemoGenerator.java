@@ -22,7 +22,7 @@ public class DemoGenerator {
 
     @Outgoing("write-to")
     public Flowable<Integer> generate() {
-        return Flowable.interval(5, TimeUnit.SECONDS).map(tick -> {
+        return Flowable.interval(50, TimeUnit.SECONDS).map(tick -> {
             int value = random.nextInt(100);
             log.debug(">> tick: {}, value: {}", tick, value);
             return value;
